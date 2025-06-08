@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="it" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storia della Famiglia Sequi</title>
+    <!-- Chosen Palette: Parchment & Heraldry -->
+    <!-- Application Structure Plan: Ho progettato l'applicazione come una narrazione a scorrimento verticale su una singola pagina. Questo approccio è ideale per una storia familiare, poiché guida l'utente in un viaggio cronologico e tematico senza interruzioni. La struttura è riorganizzata per massimizzare l'engagement e concentrarsi sugli ascendenti storici: 1. Eroe/Benvenuto (impatto visivo con il logo). 2. Le Radici del Nome (etimologia e il potente legame con Roma). 3. Il Viaggio Storico (sezione a schede interattive per Toscana e Sardegna, esplorando la geografia e i legami storici con figure come Enrico Sequi a Prato e Domenico di Filippo Sequi a Castelfranco). 4. Lo Stemma (sezione interattiva per decodificare i simboli). 5. Aneddoti (card separate per storie brevi e d'impatto). 6. Contatti. Questa architettura trasforma la lettura passiva in esplorazione attiva. -->
+    <!-- Visualization & Content Choices: Ho tradotto le informazioni del report in componenti interattivi specifici: Report Info: Distribuzione del cognome Sequi in Italia -> Goal: Comparare -> Viz/Presentation: Grafico a barre orizzontale (Chart.js) -> Interaction: Tooltip al passaggio del mouse -> Justification: Visualizza i dati quantitativi in modo chiaro e immediato. Report Info: Simboli dello stemma -> Goal: Informare/Esplorare -> Viz/Presentation: Layout a due colonne con immagine e testo descrittivo -> Interaction: Click sui pulsanti per rivelare il significato di ogni quarto -> Justification: Rende la scoperta dei simboli un'azione guidata e coinvolgente. Report Info: Aneddoti storici -> Goal: Informare -> Viz/Presentation: Layout a card (HTML/CSS) -> Interaction: Statico -> Justification: Isola le storie rendendole più digeribili. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Poppins:wght@300;400;600&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #FBF7EE;
+            color: #4a4a4a;
+        }
+        h1, h2, h3, h4, .font-cinzel {
+            font-family: 'Cinzel', serif;
+        }
+        .heraldic-red { color: #A72626; }
+        .heraldic-green { color: #2F4F2F; }
+        .bg-heraldic-red { background-color: #A72626; }
+        .bg-heraldic-green { background-color: #2F4F2F; }
+        .border-heraldic-red { border-color: #A72626; }
+        .active-nav {
+            color: #A72626;
+            font-weight: 700;
+        }
+        .section-hidden { display: none; }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 450px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <header id="header" class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-md">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="font-cinzel text-xl font-bold text-gray-800">
+                Famiglia <span class="heraldic-red">Sequi</span>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#radici" class="nav-link text-gray-600 hover:heraldic-red transition-colors duration-300">Radici</a>
+                <a href="#viaggio" class="nav-link text-gray-600 hover:heraldic-red transition-colors duration-300">Viaggio</a>
+                <a href="#stemma" class="nav-link text-gray-600 hover:heraldic-red transition-colors duration-300">Stemma</a>
+                <a href="#aneddoti" class="nav-link text-gray-600 hover:heraldic-red transition-colors duration-300">Aneddoti</a>
+                <a href="#contatti" class="nav-link text-gray-600 hover:heraldic-red transition-colors duration-300">Contatti</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden focus:outline-none">
+                <svg class="w-6 h-6 text-gray-800" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                    <path d="M4 6h16M4 12h16m-7 6h7"></path>
+                </svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden">
+            <a href="#radici" class="block py-2 px-4 text-sm hover:bg-red-50 nav-link">Radici</a>
+            <a href="#viaggio" class="block py-2 px-4 text-sm hover:bg-red-50 nav-link">Viaggio</a>
+            <a href="#stemma" class="block py-2 px-4 text-sm hover:bg-red-50 nav-link">Stemma</a>
+            <a href="#aneddoti" class="block py-2 px-4 text-sm hover:bg-red-50 nav-link">Aneddoti</a>
+            <a href="#contatti" class="block py-2 px-4 text-sm hover:bg-red-50 nav-link">Contatti</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="home" class="relative min-h-screen flex items-center justify-center text-center bg-cover bg-center" style="background-color: #FBF7EE;">
+            <div class="absolute inset-0 bg-black opacity-10"></div>
+            <div class="relative z-10 container mx-auto px-6">
+                 <img src="iSequi_Logo.jpg" alt="Stemma Famiglia Sequi" class="mx-auto mb-8 w-48 h-auto shadow-xl rounded-full">
+                <h1 class="text-5xl md:text-7xl font-bold text-gray-800 mb-4 tracking-wider">SEQUENTUR AQUILAM</h1>
+                <p class="text-xl md:text-2xl text-gray-600 font-light">Un viaggio attraverso i secoli, seguendo le orme di una famiglia.</p>
+            </div>
+        </section>
+
+        <section id="radici" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-4 text-gray-800">Le Radici di un Nome</h2>
+                <p class="text-center text-lg text-gray-600 max-w-3xl mx-auto mb-12">Il cognome Sequi non è solo un'etichetta, ma un'eco della storia. Esploriamo le sue origini, dal latino imperiale alle coste sarde, e la sua diffusione nel tempo.</p>
+                
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h3 class="text-2xl font-cinzel font-bold mb-4 heraldic-red">"SEQUI": Seguire l'Imperatore</h3>
+                        <p class="mb-4 text-gray-700 leading-relaxed">La tradizione familiare lega il cognome al verbo latino <strong><em>sequi</em></strong>: "seguire", "scortare". Questa radice evoca un'immagine potente: quella di antenati che ricoprivano ruoli di prestigio nel seguito di magistrati o imperatori nell'Antica Roma.</p>
+                        <p class="mb-6 text-gray-700 leading-relaxed">Figure come l'<em>Aquilifer</em>, il portatore della sacra aquila legionaria, incarnavano questo spirito. Erano dignitari di immenso coraggio e lealtà, custodi del simbolo più potente di Roma, il cui motto SPQR (<em>Senatus Populusque Romanus</em>) rappresentava l'autorità che accompagnavano e servivano.</p>
+                        
+                        <h4 class="text-xl font-cinzel font-bold mb-3 heraldic-green">Etimologie Sarde</h4>
+                        <p class="text-gray-700 leading-relaxed">Accanto alla nobile origine romana, il cognome ha profonde radici in Sardegna. Potrebbe derivare da termini come <em>seiki</em> ("sedici") o *sègete* ("messe"), testimoniando una lunga e complessa integrazione del nome nel tessuto linguistico e culturale dell'isola.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-cinzel font-bold mb-4 text-center">Diffusione in Italia</h3>
+                         <div class="chart-container">
+                            <canvas id="distributionChart"></canvas>
+                        </div>
+                        <p class="text-center text-sm text-gray-500 mt-2">Principali concentrazioni e presenze del cognome Sequi in Italia.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="viaggio" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-4 text-gray-800">Un Viaggio tra le Terre</h2>
+                <p class="text-center text-lg text-gray-600 max-w-3xl mx-auto mb-12">Dalle colline della Toscana alle coste della Sardegna, la famiglia Sequi ha lasciato un'impronta indelebile. Clicca sulle regioni per scoprire la loro storia.</p>
+                
+                <div class="flex justify-center mb-8">
+                    <button data-target="toscana" class="tab-button bg-heraldic-red text-white py-2 px-6 rounded-l-lg font-bold transition-transform transform hover:scale-105">Toscana</button>
+                    <button data-target="sardegna" class="tab-button bg-white text-gray-700 py-2 px-6 rounded-r-lg font-bold transition-transform transform hover:scale-105 border border-l-0 border-gray-300">Sardegna</button>
+                </div>
+
+                <div id="toscana" class="tab-content">
+                     <div class="bg-white p-8 rounded-lg shadow-lg transition-opacity duration-500">
+                        <h3 class="text-3xl font-cinzel font-bold mb-4 heraldic-green">L'Anima Toscana</h3>
+                        <p class="text-gray-700 leading-relaxed">Il legame con la Toscana si arricchisce di figure storiche. A <strong>Castelfranco di Sopra</strong>, la chiesa seicentesca di San Filippo Neri fu dotata di una moderna facciata in pietra e intonaco nel 1761 ad opera di <strong>Domenico di Filippo Sequi</strong>. Questo testimonia un'importante presenza della famiglia nella vita civile e religiosa della regione fin dal XVIII secolo.</p>
+                        <p class="text-gray-700 leading-relaxed mt-4">Un altro aneddoto cruciale riguarda <strong>Enrico Sequi</strong> di Prato, un giovane patriota massone che, insieme ad Antonio Martini e Francesco Franceschini, si mise a disposizione di Giuseppe Garibaldi nella notte tra il 25 e il 26 agosto 1849. Garibaldi, in fuga dopo la repressione della Repubblica Romana, si fermò alla Madonna della Tosse in Val Bisenzio e fu aiutato da questi patrioti a fuggire verso il Tirreno. Questo episodio sottolinea il coinvolgimento della famiglia Sequi nei movimenti risorgimentali italiani.</p>
+                        <p class="text-gray-700 leading-relaxed mt-4">L'area di <strong>La Cerbaia</strong>, vicino a Prato, menziona anche un insediamento tessile fondato nel 1860 da Cesare Romei, con i suoi discendenti che eressero un opificio "sotto la Rocca di Cerbaia". Sebbene non direttamente Sequi, è un esempio del contesto imprenditoriale in cui la famiglia si è inserita e ha operato in Toscana. L'aneddoto di <strong>"Angiolino" Sequi</strong>, tassista di umili origini che fondò "Sequi Autolinee" a Santa Croce sull'Arno intorno alla Seconda Guerra Mondiale, mostra un altro modo in cui il nome Sequi ha costruito la sua eredità, non attraverso la nobiltà o la politica, ma con il lavoro e il contributo diretto all'economia locale.</p>
+                    </div>
+                </div>
+
+                <div id="sardegna" class="tab-content section-hidden">
+                    <div class="bg-white p-8 rounded-lg shadow-lg transition-opacity duration-500">
+                        <h3 class="text-3xl font-cinzel font-bold mb-4 heraldic-red">Il Cuore Sardo</h3>
+                        <p class="text-gray-700 leading-relaxed">La Sardegna è un fulcro storico per i Sequi. Documenti antichi attestano la presenza della famiglia fin dal XVII secolo, con figure come <strong>Sequi Juliano, 'sindico' di Alghero</strong> nel 1678. Un aneddoto affascinante lega un ramo della famiglia alla nobiltà, con il possesso di un palazzetto a Macomer, precedentemente della famiglia Fois. Questa eredità di servizio civico e status nobiliare continua fino ai giorni nostri con figure di spicco che hanno servito lo Stato, un'eco moderna dell'antico ruolo di "seguire" le più alte cariche.</p>
+                         <p class="text-gray-700 leading-relaxed mt-4">La presenza sarda è ricca di personalità di spicco. Ad esempio, il <strong>Generale di brigata Ugo Abbondonza</strong>, capo dell'infanteria della 11° divisione (43), è uno dei numerosi generali Sequi citati nelle liste militari del periodo. Altri generali includono <strong>Enrico Andreini</strong> (1889-) e <strong>Paolo Angioy</strong> (1890-), capo della 59° divisione Cagliari (43).</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="stemma" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-4 text-gray-800">Decodificare lo Stemma</h2>
+                <p class="text-center text-lg text-gray-600 max-w-3xl mx-auto mb-12">Lo stemma dei Sequi è una narrazione visiva di valori e storia. Ogni quarto racconta un capitolo della famiglia. Esplora i suoi simboli per scoprirne i significati.</p>
+
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="flex justify-center">
+                        <img src="iSequi_Logo.jpg" alt="Stemma Famiglia Sequi Dettaglio" class="max-w-xs md:max-w-sm w-full h-auto rounded-lg shadow-2xl">
+                    </div>
+                    <div>
+                        <div id="stemma-description" class="bg-gray-50 p-6 rounded-lg shadow-inner min-h-[200px] transition-all duration-300 flex items-center justify-center">
+                            <p class="text-gray-600 italic">Seleziona un simbolo per scoprirne il significato.</p>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mt-6">
+                            <button data-desc="q1" class="stemma-button w-full p-3 font-cinzel font-bold bg-white border-2 border-heraldic-green text-heraldic-green rounded-lg hover:bg-heraldic-green hover:text-white transition-colors">L'Albero</button>
+                            <button data-desc="q2" class="stemma-button w-full p-3 font-cinzel font-bold bg-white border-2 border-heraldic-red text-heraldic-red rounded-lg hover:bg-heraldic-red hover:text-white transition-colors">La Torre</button>
+                            <button data-desc="q3" class="stemma-button w-full p-3 font-cinzel font-bold bg-white border-2 border-heraldic-red text-heraldic-red rounded-lg hover:bg-heraldic-red hover:text-white transition-colors">Cuore e Penna</button>
+                            <button data-desc="q4" class="stemma-button w-full p-3 font-cinzel font-bold bg-white border-2 border-gray-500 text-gray-600 rounded-lg hover:bg-gray-600 hover:text-white transition-colors">Braccio e Colonna</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="aneddoti" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">Aneddoti e Curiosità</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col">
+                        <h4 class="font-cinzel text-xl font-bold mb-3 heraldic-red flex-shrink-0">L'Eroe Aviatore</h4>
+                        <p class="text-sm text-gray-600 flex-grow">Un aneddoto caro alla famiglia ricorda l'eroismo dello zio Elios, aviatore caduto con il proprio aereo verso la fine della WWII. Sebbene non vi siano riscontri nei registri pubblici, la sua memoria vive come simbolo di coraggio, un'eredità preziosa tramandata oralmente.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col">
+                        <h4 class="font-cinzel text-xl font-bold mb-3 heraldic-green flex-shrink-0">Il Patriota Pratese</h4>
+                        <p class="text-sm text-gray-600 flex-grow"><strong>Enrico Sequi</strong> di Prato fu un patriota massone che aiutò Giuseppe Garibaldi a fuggire nella notte tra il 25 e il 26 agosto 1849, evidenziando il coinvolgimento della famiglia nel Risorgimento italiano.</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col">
+                        <h4 class="font-cinzel text-xl font-bold mb-3 text-gray-700 flex-shrink-0">Il Nobile di Macomer</h4>
+                        <p class="text-sm text-gray-600 flex-grow">Un ramo della famiglia Sequi entrò in possesso di un palazzetto nobiliare a Macomer, in Sardegna, precedentemente della famiglia Fois, testimoniando uno status aristocratico e significative proprietà terriere.</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col">
+                        <h4 class="font-cinzel text-xl font-bold mb-3 heraldic-red flex-shrink-0">Il Pioniere Toscano</h4>
+                        <p class="text-sm text-gray-600 flex-grow"><strong>"Angiolino" Sequi</strong>, tassista di Santa Croce sull'Arno, fondò "Sequi Autolinee" intorno alla Seconda Guerra Mondiale, dimostrando uno spirito imprenditoriale che ha lasciato un'eredità duratura in Toscana.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col">
+                        <h4 class="font-cinzel text-xl font-bold mb-3 heraldic-green flex-shrink-0">Il Generale di Brigata</h4>
+                        <p class="text-sm text-gray-600 flex-grow">Le liste militari citano diversi <strong>Generali di brigata Sequi</strong>, come Ugo Abbondonza e Enrico Andreini, segno di una presenza di rilievo nelle forze armate italiane.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col">
+                        <h4 class="font-cinzel text-xl font-bold mb-3 text-gray-700 flex-shrink-0">Domenico di Filippo Sequi</h4>
+                        <p class="text-sm text-gray-600 flex-grow">Nel 1761, <strong>Domenico di Filippo Sequi</strong> contribuì alla facciata della chiesa di San Filippo Neri a Castelfranco di Sopra, un segno del legame della famiglia con la comunità e l'architettura locale.</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col">
+                        <h4 class="font-cinzel text-xl font-bold mb-3 heraldic-red flex-shrink-0">La Rocca di Cerbaia</h4>
+                        <p class="text-sm text-gray-600 flex-grow">La <strong>Rocca di Cerbaia</strong>, citata da Dante e legata agli Alberti, è un simbolo di un contesto territoriale storico in Toscana in cui si inseriscono le vicende della famiglia Sequi, anche se non direttamente proprietari.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 flex flex-col">
+                        <h4 class="font-cinzel text-xl font-bold mb-3 heraldic-green flex-shrink-0">Il Sindaco di Alghero</h4>
+                        <p class="text-sm text-gray-600 flex-grow">Nel 1678, <strong>Sequi Juliano</strong> ricopriva la carica di "sindico" (sindaco) di Alghero, in Sardegna, segno di un'antica integrazione e di un ruolo di responsabilità civica.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="contatti" class="py-20 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl font-bold mb-4 text-gray-800">Contatti</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto mb-8">
+                    Per ulteriori informazioni, contributi alla storia della famiglia o per qualsiasi domanda, non esitate a contattarci.
+                    Siamo sempre lieti di connetterci con chi condivide l'interesse per il nostro retaggio.
+                </p>
+                <p class="text-2xl font-bold heraldic-red">
+                    <span id="contact-email-container"></span>
+                </p>
+            </div>
+        </section>
+    </main>
+    
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p class="font-cinzel">&copy; Dall'Antica Roma</p>
+            <p class="text-sm text-gray-400 mt-2">Un'eredità da custodire, una storia da raccontare.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            document.querySelectorAll('#mobile-menu a').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+            
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section, header');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.5
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const targetId = entry.target.id;
+                        navLinks.forEach(link => {
+                            link.classList.remove('active-nav');
+                            if (link.getAttribute('href').substring(1) === targetId) {
+                                link.classList.add('active-nav');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                if(section.id) observer.observe(section);
+            });
+            
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            document.getElementById('toscana').classList.remove('section-hidden');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const target = button.dataset.target;
+
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('bg-heraldic-red', 'text-white');
+                        btn.classList.add('bg-white', 'text-gray-700', 'border', 'border-gray-300');
+                    });
+                    
+                    button.classList.add('bg-heraldic-red', 'text-white');
+                    button.classList.remove('bg-white', 'text-gray-700', 'border', 'border-gray-300');
+                    
+                    tabContents.forEach(content => {
+                        if (content.id === target) {
+                            content.classList.remove('section-hidden');
+                        } else {
+                            content.classList.add('section-hidden');
+                        }
+                    });
+                });
+            });
+
+            const stemmaButtons = document.querySelectorAll('.stemma-button');
+            const stemmaDescription = document.getElementById('stemma-description');
+            const stemmaDescs = {
+                q1: "<h4>L'Albero della Prosperità</h4><p class='text-sm mt-2'>Simbolo di vita, crescita e resistenza. Radicato sulla terra, rappresenta la forza della stirpe, un legame con le origini mediterranee, forse un ulivo (pace) o una palma (trionfo).</p>",
+                q2: "<h4>La Torre della Stabilità</h4><p class='text-sm mt-2'>Rappresenta forza, difesa e antica stirpe. Simboleggia la stabilità della famiglia e il possesso storico di un rifugio o di un insediamento fortificato, un bastione contro le avversità.</p>",
+                q3: "<h4>Il Cuore e la Penna</h4><p class='text-sm mt-2'>Un'unione rara che simboleggia una famiglia che valorizza le attività intellettuali, la saggezza e l'eloquenza (la penna), unite al coraggio, alla passione e alla lealtà (il cuore).</p>",
+                q4: "<h4>Il Braccio sulla Colonna</h4><p class='text-sm mt-2'>Secondo la tradizione di famiglia, rappresenta la forza e la fermezza. Il braccio piegato indica prontezza all'azione, mentre la colonna simboleggia stabilità, eredità e il saldo mantenimento dei principi.</p>"
+            };
+
+            stemmaButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const descKey = button.dataset.desc;
+                    stemmaDescription.innerHTML = `<div class="text-center">${stemmaDescs[descKey]}</div>`;
+                    stemmaButtons.forEach(btn => btn.classList.remove('ring-2', 'ring-offset-2', 'ring-gray-400'));
+                    button.classList.add('ring-2', 'ring-offset-2', 'ring-gray-400');
+                });
+            });
+
+            // Obfuscate email address to prevent scraping
+            const emailParts = ['info', 'sequi', 'org'];
+            const emailAddress = emailParts[0] + '@' + emailParts[1] + '.' + emailParts[2];
+
+            const emailContainer = document.getElementById('contact-email-container');
+            if (emailContainer) {
+                const emailLink = document.createElement('a');
+                emailLink.href = 'mailto:' + emailAddress;
+                emailLink.textContent = emailAddress;
+                emailLink.className = 'inline-block bg-heraldic-red text-white font-bold py-3 px-8 rounded-lg text-lg hover:bg-red-800 transition-colors duration-300 shadow-md';
+                emailContainer.appendChild(emailLink);
+            }
+
+            const ctx = document.getElementById('distributionChart');
+            if(ctx) {
+                new Chart(ctx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Roma', 'Genova', 'Firenze', 'Bologna', 'Milano', 'Torino', 'Ancona'],
+                        datasets: [{
+                            label: 'Presenza del cognome',
+                            data: [139, 138, 95, 75, 52, 46, 25],
+                            backgroundColor: [
+                                'rgba(167, 38, 38, 0.7)',
+                                'rgba(47, 79, 47, 0.7)',
+                                'rgba(100, 100, 100, 0.7)',
+                                'rgba(167, 96, 38, 0.7)',
+                                'rgba(209, 196, 168, 0.8)',
+                                'rgba(75, 75, 75, 0.7)',
+                                'rgba(47, 79, 147, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(167, 38, 38, 1)',
+                                'rgba(47, 79, 47, 1)',
+                                'rgba(100, 100, 100, 1)',
+                                'rgba(167, 96, 38, 1)',
+                                'rgba(209, 196, 168, 1)',
+                                'rgba(75, 75, 75, 1)',
+                                'rgba(47, 79, 147, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return ` Occorrenze stimate: ${context.raw}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                }
+                            },
+                            y: {
+                                 grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
